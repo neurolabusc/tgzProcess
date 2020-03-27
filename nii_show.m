@@ -9,6 +9,7 @@ if ~exist('imgs', 'var')
    [files,pth] = uigetfile({'*.nii;*.gz;';'*.*'},'Select the Image[s]', 'MultiSelect', 'on'); 
    imgs = strcat(pth, files);
 end
+if isempty(imgs), return; end
 imgs = cellstr(imgs);
 if numel(imgs) < 1, return; end
 h = findobj('type','figure','name','mat2ortho'); %re-use if available
@@ -26,7 +27,15 @@ for i = 1: numel(imgs)
     plotOrthoSub(nii.hdr, nii.img, XYZmm, i, numel(imgs), nam);
 end
 if ~exist('png', 'var'), return; end
-[~,~,x] = fileparts(png);
+[p,n,x] = fileparts(png);
+if strcmpi(x,'.gz')
+    png = fullfile(p,n);
+    [p,n,x] = fileparts(png);
+end
+if strcmpi(x,'.nii')
+    png = fullfile(p,n);
+    [p,n,x] = fileparts(png);
+end
 if ~strcmpi(x,'.png')
     png = [png, '.png'];
 end

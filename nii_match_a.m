@@ -21,31 +21,30 @@ function nii_match_a (basepth)
 if ~exist('basepth','var')
     basepth = pwd;
 end
-cd(basepth);
-subjs = dir('M*');
+
 tmpdir = fullfile(pwd, 'tmp');
 if ~exist(tmpdir, 'dir')
    mkdir(tmpdir) 
 end
+subjs = dir(fullfile(basepth, 'M*'));
+fnms={subjs.name};
+[~,idx]=sort(fnms);
+subjs=subjs(idx);
 for s = 1: numel(subjs)
     if ~subjs(s).isdir, continue; end
     if ~isempty(strfind(subjs(s).name,'_')), continue; end
-    fprintf('---');
     subjpth = fullfile(basepth, subjs(s).name);
-    fprintf('%s\n', subjs(s).name);
-    cd(subjpth);
+    fprintf('%d/%d %s\n', s, numel(subjs), subjs(s).name);
     outdir = fullfile(tmpdir, subjs(s).name);
     mkdir(outdir);
     %simages = [];
-    visits = dir('*');
-    modalities = {'T1','T2','DTI','fMRI'};
+    visits = dir(fullfile(subjpth, '*'));
     for v = 1: numel(visits)
         if ~visits(v).isdir, continue; end
         if visits(v).name(1) == '.', continue; end
         fprintf(' %s\n', visits(v).name);
         visitpth = fullfile(subjpth, visits(v).name);
-        cd(visitpth);
-        img = representative_img();
+        img = representative_img(visitpth);
         if isempty(img)
             fprintf(' ??? No scans for %s\n', visits(v).name);
             continue; 
@@ -69,18 +68,18 @@ for s = 1: numel(subjs)
     %    copyfile(simages{1}, outnm);
     %end
 end
-cd(basepth);
 %end
 
-function img = representative_img()
+function img = representative_img(pth)
+img = [];
 modalities = {'T1','T2','DTI','fMRI'};
 for i = 1 : numel(modalities)
-    images = dir([modalities{i}, '*.nii.gz']);
+    images = dir(fullfile(pth, [modalities{i}, '*.nii.gz']));
     if ~isempty(images)
        img = images(1).name;
        return
     end
-    images = dir([modalities{i}, '*.nii']);
+    images = dir(fullfile(pth, [modalities{i}, '*.nii']));
     if ~isempty(images)
        img = images(1).name;
        return

@@ -13,16 +13,18 @@ function nii_match_b (basepth)
 if ~exist('basepth','var')
     basepth = pwd;
 end
-basepth = '/Users/chris/Downloads/harvestZip/tgzProcess/x/tmp'
+basepth = '/Users/chris/Downloads/harvestZip/tgzProcess/tmp'
 %cd(basepth);
 %subjs = dir('M*');
 subjs = dir(fullfile(basepth, 'M*'));
+fnms={subjs.name};
+[~,idx]=sort(fnms);
+subjs=subjs(idx);
 for s = 1: numel(subjs)
     if ~subjs(s).isdir, continue; end
     if ~isempty(strfind(subjs(s).name,'_')), continue; end
-    fprintf('---');
     subjpth = fullfile(basepth, subjs(s).name);
-    fprintf('%s\n', subjs(s).name);
+    fprintf('%d/%d\t%s\n', s, numel(subjs), subjs(s).name);
     %cd(subjpth);
     %simages = [];
     %visits = dir('*.nii');

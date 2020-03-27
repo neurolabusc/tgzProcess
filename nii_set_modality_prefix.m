@@ -20,7 +20,7 @@ function setModalitySub(pth, isRename)
 nams = subFileSub(pth, '.json');
 fixBrokenModalities = false;
 for i = 1:numel(nams)
-    njson = nams{i}
+    njson = nams{i};
     if njson(1) == '.', continue; end
     modality = [];
     [~, n] = fileparts(njson); %remove extension

@@ -138,7 +138,8 @@ for k=1:size(Nii.dat,6),
     end
 end
 if isSaveBitmap
-    plotOrthoSub(Noo2.dat(:,:,:), outname);
+    %plotOrthoSub(Noo2.dat(:,:,:), outname);
+    nii_show(outname, outname)
 end
 if isOverwrite
     movefile(outname,fnm);
@@ -155,8 +156,6 @@ end
 
 %end defaceSub()
 
-function plotOrthoSub(img, Caption)
-nii_show(img, Caption)
 % function plotOrthoSub(img, Caption)
 % xhair = [size(img,1)/2, size(img,2)/2, size(img,3)/2 ];
 % xhair = round([size(img,1)/2, size(img,2)/2, size(img,3)/2 ]);
