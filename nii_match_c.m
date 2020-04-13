@@ -1,4 +1,4 @@
-function nii_match_b (basepth)
+function nii_match_c (basepth)
 %Normalize all scans from an individual and display
 %
 %Images are basepth/Participant/Session/*.nii
@@ -13,35 +13,21 @@ function nii_match_b (basepth)
 if ~exist('basepth','var')
     basepth = pwd;
 end
-basepth = '/Users/chris/Downloads/harvestZip/tgzProcess/tmp';
+basepth = '/Users/chris/Downloads/harvestZip/tgzProcess/tmp'
 %cd(basepth);
 %subjs = dir('M*');
 subjs = dir(fullfile(basepth, 'M*'));
-%subjs = dir(fullfile(basepth, 'M*004'));
 fnms={subjs.name};
 [~,idx]=sort(fnms);
 subjs=subjs(idx);
-nimg = 0;
 for s = 1: numel(subjs)
     if ~subjs(s).isdir, continue; end
-    if subjs(s).name(1) == '.', continue; end
     if ~isempty(strfind(subjs(s).name,'_')), continue; end
     subjpth = fullfile(basepth, subjs(s).name);
     fprintf('%d/%d\t%s\n', s, numel(subjs), subjs(s).name);
     %cd(subjpth);
     %simages = [];
     %visits = dir('*.nii');
-    visits = dir(fullfile(subjpth, '*.nii'));
-    for v = 1: numel(visits)
-        if visits(v).isdir, continue; end
-        if visits(v).name(1) == '.', continue; end
-        if visits(v).name(1) == 'w', continue; end %already warped
-        visitname = fullfile(subjpth, visits(v).name);
-        warpname = fullfile(subjpth, ['w', visits(v).name]);
-        if exist(warpname, 'file'), continue; end
-        %fprintf(' %s\n', visits(v).name);
-        affine_norm(visitname);
-    end
     visits = dir(fullfile(subjpth, 'w*.nii'));
     imgs = [];
     for v = 1: numel(visits)
@@ -49,10 +35,9 @@ for s = 1: numel(subjs)
         warpname = fullfile(subjpth, visits(v).name);
         imgs = [imgs, cellstr(warpname)];
     end
-    nii_show(imgs,subjs(s).name);
-    nimg = nimg + numel(imgs);
+    nii_show2(imgs,subjs(s).name);
+    
 end
-fprintf('%d sessions\n', nimg);
 %cd(basepth);
 %end
 

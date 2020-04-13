@@ -19,7 +19,7 @@ function nii_match_a (basepth)
 %       fMRI.nii
 %
 %Example
-% nii_match_a ('/Volumes/Chris5TB/Universe/master')
+% nii_match_zero ('/Volumes/Chris5TB/Universe/master')
 if ~exist('basepth','var')
     basepth = pwd;
 end
@@ -36,31 +36,15 @@ for s = 1: numel(subjs)
     if ~subjs(s).isdir, continue; end
     if ~isempty(strfind(subjs(s).name,'_')), continue; end
     subjpth = fullfile(basepth, subjs(s).name);
-    fprintf('%d/%d %s\n', s, numel(subjs), subjs(s).name);
-    outdir = fullfile(tmpdir, subjs(s).name);
-    mkdir(outdir);
+    %fprintf('%d/%d %s\n', s, numel(subjs), subjs(s).name);
     %simages = [];
     visits = dir(fullfile(subjpth, '*'));
     for v = 1: numel(visits)
         if ~visits(v).isdir, continue; end
         if visits(v).name(1) == '.', continue; end
-        fprintf(' %s\n', visits(v).name);
+        %fprintf(' %s\n', visits(v).name);
         visitpth = fullfile(subjpth, visits(v).name);
-        img = representative_img(visitpth);
-        if isempty(img)
-            fprintf(' ??? No scans for %s\n', visits(v).name);
-            continue; 
-        end
-        %fprintf('  %s\n', image);
-        [~,n,x] = fileparts(img);
-        innm = fullfile(visitpth, [n, x]);
-        outnm = fullfile(outdir, [n, x]);
-        fprintf('  %s -> %s\n', innm, outnm);
-        copyfile(innm, outnm);
-        if strcmpi(x, '.gz')
-            gunzip(outnm);
-            delete(outnm);
-        end
+        representative_img(visitpth);
         %simages{end+1} = fullfile(visitpth, image);
     end
     %if isempty(simages), continue; end
@@ -72,18 +56,14 @@ for s = 1: numel(subjs)
 end
 %end
 
-function img = representative_img(pth)
-img = [];
-modalities = {'T1','T2','DTI','fMRI'};
-for i = 1 : numel(modalities)
-    images = dir(fullfile(pth, [modalities{i}, '*.nii.gz']));
-    if ~isempty(images)
-       img = images(1).name;
-       return
-    end
-    images = dir(fullfile(pth, [modalities{i}, '*.nii']));
-    if ~isempty(images)
-       img = images(1).name;
-       return
-    end
+function representative_img(pth)
+visits = dir(fullfile(pth, ['*']));
+for v = 1: numel(visits)
+    if visits(v).isdir, continue; end
+    if visits(v).name(1) == '.', continue; end
+	if visits(v).bytes > 1, continue; end
+    fprintf('->\t%s\n', fullfile(pth, visits(v).name));
+
+    %simages{end+1} = fullfile(visitpth, image);
 end
+%end

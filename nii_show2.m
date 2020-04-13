@@ -12,24 +12,6 @@ end
 if isempty(imgs), return; end
 imgs = cellstr(imgs);
 if numel(imgs) < 1, return; end
-%start overflow: too many images for one panel
-kMaxMosaic = 16;
-if numel(imgs) > kMaxMosaic 
-    n = 0;
-    [p,nm,x] = fileparts(png);
-    i = 1;
-    while n < numel(imgs)
-        nn = min(n+kMaxMosaic, numel(imgs));
-        %fprintf('%d..%d\n', n+1, nn);
-        imgsX = imgs(n+1: nn);
-        pngX = fullfile(p,[nm, '_', num2str(i), x]);
-        nii_show(imgsX, pngX);
-        n = n + kMaxMosaic;
-        i = i + 1;
-    end
-    return;   
-end
-%end overflow
 h = findobj('type','figure','name','mat2ortho'); %re-use if available
 if isempty(h), h = figure('Name','mat2ortho','NumberTitle','off'); end; %make sure we do not use SPM graphics
 figure(h); %make current
@@ -42,16 +24,16 @@ for i = 1: numel(imgs)
     nii.hdr.dim = nii.hdr.dim(1:3);
     nii.img = nii.img(:,:,:,1);
     [~,nam,~] = fileparts(fnm);
-    %parse date
-    k = regexp(nam, '_20', 'once');
+    %date only
+    k = strfind(nam, '_2');
     if ~isempty(k)
-       nam2 = nam(k+1:end); 
-       k = regexp(nam2, '_', 'once');
-       if ~isempty(k)
-        nam = nam2(1:k-1);
-       end
-    
+        nam = nam(k(1)+1:end);
+        k = strfind(nam, '_');
+        if ~isempty(k)
+            nam = nam(1:k(1)-1);
+        end
     end
+    %continue
     plotOrthoSub(nii.hdr, nii.img, XYZmm, i, numel(imgs), nam);
 end
 if ~exist('png', 'var'), return; end
@@ -134,7 +116,7 @@ set(gca,'XTickLabel', [],'XTick',[],'YTick',[]);
 axis image
 w = wid/2;
 h = ht/2;
-annotation('textbox',[X+w Y w h],'String',Caption,'FontSize',9,'fontn','Arial', 'color','red', 'BackgroundColor', 'white', 'LineStyle','none')
+annotation('textbox',[X+w Y w h],'String',Caption,'FontSize',18,'fontn','Arial', 'color','red', 'BackgroundColor', 'white', 'LineStyle','none')
 %end plotImgSub()
 
 function XYZmm = getCenterOfIntensitySub(hdr, img)
